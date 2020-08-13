@@ -44,7 +44,9 @@ class BaseAnalyzer():
 
 	def write_file(self, fname, ctx):
 		file_path = os.path.join(self.cfg.file_log_dir, fname)
-		f = open(file_path, "wb", 0)
+		# f = open(file_path, "wb", 0)
+		import codecs
+		f = codecs.open(file_path, mode='wb', encoding='utf-8', buffering=0)
 		f.write(ctx)
 		f.close()
 

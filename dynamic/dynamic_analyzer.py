@@ -913,7 +913,7 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 		self.log.info("The output will be generated with format %s", fmt)
 		self.add_action(self.create_end_action()) # this will be the last action
 		# output
-		output_json = json.dumps(self.action_list, indent=4, sort_keys=False)
+		output_json = json.dumps(self.action_list, indent=4, sort_keys=False, ensure_ascii=False)
 		output_fname = self.info["hash_md5"]+".dynamic"
 		self.write_file(output_fname,output_json)
 	def chmod_exe(self):

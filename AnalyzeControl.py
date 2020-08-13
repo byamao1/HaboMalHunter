@@ -382,18 +382,25 @@ def clean_temp(temp_list):
 		shutil.rmtree(d, True)
 
 def init_target_loader(cfg):
-	file_path_32 = cfg.target_loader+".32.elf";
-	file_path_64 = cfg.target_loader+".64.elf";
-	if os.path.exists(file_path_32) and os.path.exists(file_path_64):
-		log.info("target loader: %s, %s",file_path_32,file_path_64)
-		# chmod 0777 targeT_loader
-		os.chmod(file_path_64, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
-		os.chmod(file_path_32, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
-		cfg.target_loader_64 = file_path_64
-		cfg.target_loader_32 = file_path_32
-	else:
+	file_path_32 = cfg.target_loader+".32.elf"
+	file_path_64 = cfg.target_loader+".64.elf"
+
+	if not os.path.exists(file_path_32) and not os.path.exists(file_path_64):
 		log.critical("failed to locate target loader: %s,%s",file_path_32,file_path_64)
 		os._exit(2)
+
+	if os.path.exists(file_path_32):
+		log.info("target loader: %s",file_path_32)
+		# chmod 0777 targeT_loader
+		os.chmod(file_path_32, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
+		cfg.target_loader_32 = file_path_32
+
+	if os.path.exists(file_path_64):
+		log.info("target loader: %s",file_path_64)
+		# chmod 0777 targeT_loader
+		os.chmod(file_path_64, stat.S_IRWXU|stat.S_IRWXG|stat.S_IRWXO)
+		cfg.target_loader_64 = file_path_64
+
 
 def generate_tag_file(cfg, do_static, do_dynamic):
 	if do_static:
