@@ -61,8 +61,9 @@ import base
 
 TIME_LIMIT_DYNAMIC_DEF=60 # 60 seconds for dynamic analysis timeout
 BASE_HOME='/root/'
+PROJECT_HOME = os.path.abspath(os.path.join(__file__, ".."))
 SECTION_DEF = 'main'
-CONFIG_PATH_DEF='config.ini'
+CONFIG_PATH_DEF=os.path.join(PROJECT_HOME, 'config.ini')
 ENV_PREFIX='HABO_'
 LOG_FMT = "%(asctime)s [%(filename)s:%(lineno)d %(funcName)s] %(levelname)s: %(message)s"
 
@@ -261,7 +262,7 @@ def is_executable(file_path):
 	(file_type, full_info) = get_filetype(file_path)
 	# until now, ELF is only supported.
 	exec_type_list = ['ELF']
-	ret = False
+	ret = True #False
 	if file_type in exec_type_list:
 		if -1 != full_info.find("executable"):
 			ret = True
@@ -578,13 +579,16 @@ def generate_output_log(cfg, do_static, do_dynamic):
 			shutil.copyfile(main_dynamic, output_dynamic)
 		log.info("output dynamic logs %s have been generated", output_dynamic)
 
+def get_py_abspath(rel_path):
+	return os.path.join(PROJECT_HOME, rel_path)
+
 def generate_html(cfg):
 	cwd = os.getcwd()
-	os.chdir('/root/util/log_to_html/')
+	os.chdir(get_py_abspath('util/log_to_html/'))
 	output_dynamic = os.path.join(cfg.file_log_dir, cfg.dynamic_log)
-	cmd_log_line = ["/usr/bin/python","/root/util/log_to_html/Linux_Trim.py",output_dynamic]
+	cmd_log_line = ["/usr/bin/python",get_py_abspath("util/log_to_html/Linux_Trim.py"),output_dynamic]
 	subprocess.call(cmd_log_line)
-	cmd_html_line = ["/usr/bin/python","/root/util/log_to_html/log_to_html.py",cfg.file_log_dir,"-elf"]
+	cmd_html_line = ["/usr/bin/python",get_py_abspath("util/log_to_html/log_to_html.py"),cfg.file_log_dir,"-elf"]
 	subprocess.call(cmd_html_line)
 	os.chdir(cwd)
 
