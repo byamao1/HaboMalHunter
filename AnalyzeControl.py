@@ -183,7 +183,7 @@ def init_log(cfg):
 
 	log.info("Linux Malware Analysis System. version:%s", cfg.version)
 	log.debug("Configuration: ")
-	log.debug(vars(cfg))
+	log.debug("\n"+json.dumps(vars(cfg), indent=4, ensure_ascii=False))
 	# LD_DEBUG
 	cfg.ld_debug_log_abs = os.path.join(file_log_dir, cfg.ld_debug_log)
 	# inetsim dir
