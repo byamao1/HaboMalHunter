@@ -54,9 +54,9 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 				self.trace_type_decision()
 				self.start_net_interface()
 				self.add_action(self.create_launch_action())
-				self.launch()
+				self.launch()  # launch ELF sample
 				self.post_launch()
-				self.parse_monitor_log()
+				self.parse_monitor_log()   # parse log of monitor
 				self.sort_and_add_action()
 				self.add_action(self.create_terminate_action())
 			else:

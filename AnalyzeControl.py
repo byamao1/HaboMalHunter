@@ -263,10 +263,10 @@ def is_executable(file_path):
 	# until now, ELF is only supported.
 	exec_type_list = ['ELF']
 	ret = True #False
-	if file_type in exec_type_list:
-		if -1 != full_info.find("executable"):
-			ret = True
-	log.info("file %s executable: %r",file_path, ret)
+	# if file_type in exec_type_list:
+	# 	if -1 != full_info.find("executable"):
+	# 		ret = True
+	# log.info("file %s executable: %r",file_path, ret)
 	return ret
 
 def do_work(cfg, do_static, do_dynamic):
