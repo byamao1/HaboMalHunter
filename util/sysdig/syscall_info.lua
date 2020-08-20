@@ -86,11 +86,19 @@ function on_event()
 		return true
 	end
 
+
 	ts =  evt.field(fevtime)
 	src = string.format("%s(PID=%d, TID=%d)",evt.field(fexeline), evt.field(fsrc_pid), evt.field(fsrc_tid))
 	dst = string.format("%s: %s", evt.field(fsystype), evt.field(fevinfo))
+
+	src = string.gsub(src, "\"", "'")
+	src = string.gsub(src, "\\", "\\\\")
+	dst = string.gsub(dst, "\"", "'")
+	dst = string.gsub(dst, "\\", "\\\\")
+
 	line = string.format('[ "%s", "%s", "%s" ]', ts, src, dst)
 	print(line)
 
 	return true
-end	
+end
+
