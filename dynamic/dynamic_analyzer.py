@@ -905,9 +905,9 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 		sorted_list = sorted(self.action_info, key=lambda x:x['ts'])
 		for node in sorted_list:
 			if node.has_key('comment'):
-				self.add_action([node['src'],node['dst'],node['ID'],node['ID_NOTE'],node['comment']])
+				self.add_action([node['src'],node['dst'],node['ID'],node['ID_NOTE'],node['comment'],node['ts'].strftime("%H:%M:%S.%f")])
 			else:
-				self.add_action([node['src'],node['dst'],node['ID'],node['ID_NOTE']])
+				self.add_action([node['src'],node['dst'],node['ID'],node['ID_NOTE'],node['ts'].strftime("%H:%M:%S.%f")])
 
 	def output(self, fmt):
 		self.log.info("The output will be generated with format %s", fmt)
