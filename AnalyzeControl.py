@@ -135,7 +135,7 @@ def init_cfg(cfg_path, args):
 	cfg.enable_mem_analysis = strTobool(cfg.enable_mem_analysis)
 	return cfg
 
-def init_arguments(argv):
+def init_arguments():
 	parser = argparse.ArgumentParser(description='Linux Malware Analysis System')
 	parser.add_argument('-v', '--verbose', help='Display debug messages', action='store_true', required=False)
 	parser.add_argument('-t', '--test', help='Only init and output Tag files', action='store_true', required=False)
@@ -621,9 +621,29 @@ def init_localtime():
 		os.remove(f_localtime)
 	os.symlink(f_src,f_localtime)
 
+
+def _extract_target_argv(argc, argv):
+	"""
+	Extract argv of target from sys.argv
+	@param argc:
+	@param argv:
+	@return:
+	"""
+	target_argv = None
+	for argv_i, arg in enumerate(argv):
+		if arg == '-l':
+			str_list = argv[argv_i + 1].split(" ")
+			if len(str_list) > 1:
+				sys.argv[argv_i + 1] = str_list[0]
+				target_argv = " ".join(str_list[1:])
+			break
+	return target_argv
+
 def main(argc, argv):
 	init_localtime()
-	cfg = init_arguments(argv)
+	target_argv = _extract_target_argv(argc, argv)
+	cfg = init_arguments()
+	cfg.target_argv = target_argv
 	init_log(cfg)
 	log.info("version: %s",cfg.version)
 	init_workspace(cfg,cfg.is_inplace)
@@ -694,6 +714,8 @@ def main(argc, argv):
 		# zip all log file
 		compress_log(cfg)
 	return 0
+
+
 
 if "__main__" == __name__ :
 	ret = main(len(sys.argv), sys.argv)

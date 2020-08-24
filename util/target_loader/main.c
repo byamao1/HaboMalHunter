@@ -38,8 +38,7 @@ void sig_handler(int signum){
 void sig_manager(){
 	signal(SIGCONT,sig_handler);
 }
-void target_loader(char* target, char** envp){
-	char* para_list[2]={target,NULL};
+void target_loader(char* target, char** para_list, char** envp){
 	int ret = execve(target,para_list,envp);
 	if (-1==ret){
 		printf("execve error:%s for loading the target:%s\n", strerror(errno),target);
@@ -47,12 +46,22 @@ void target_loader(char* target, char** envp){
 	}
 }
 void usage(){
-	printf("usage: target_loader target_path\n");
+	printf("usage: target_loader target_path target_params\n");
+}
+// Support for run with params
+void get_para_list(int argc, char** argv, char** para_list){
+    for(int i=0;i<argc;i++){
+        if(i==argc-1){
+            para_list[i]=NULL;
+            continue;
+        }
+        para_list[i]=argv[i+1];
+    }
 }
 int main(int argc, char** argv, char** envp){
 	char* target=NULL;
 	//TODO LD_PRELOAD, LD_DEBUG
-	if (2!=argc){
+	if (2>argc){
 		usage();
 		exit(1);
 	}else{
@@ -61,6 +70,9 @@ int main(int argc, char** argv, char** envp){
 	print_pid();
 	sig_manager();
 	pause();
-	target_loader(target,envp);
+
+    char* para_list[argc];
+    get_para_list(argc, argv, para_list);
+	target_loader(target,para_list,envp);
 	return 0;
 }

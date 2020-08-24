@@ -950,7 +950,11 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 			loader_env.pop("https_proxy",None)
 		p=None
 		try:
-			p = subprocess.Popen([loader, file_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=loader_env)
+			cmd = [loader, file_path]
+			if self.cfg.target_argv is not None:
+				cmd.append(self.cfg.target_argv)
+			self.log.info("Launch cmd: %s", cmd)
+			p = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=loader_env)
 		except OSError as e:
 			self.log.critical("popen error: %s",str(e))
 			os._exit(3)
