@@ -57,7 +57,8 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 				self.launch()  # launch ELF sample
 				self.post_launch()
 				self.parse_monitor_log()   # parse log of monitor
-				self.sort_and_add_action()
+				sorted_list = self.sort_and_add_action()
+				self.write_to_csv(sorted_list, csv_name=self.info["hash_md5"]+".csv")
 				self.add_action(self.create_terminate_action())
 			else:
 				error_msg = "The target can not be executed. add no exe Error report"
@@ -422,6 +423,34 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 			data_list = self.handle_sysdig(output_list, metrics.D_ID_SYSCALL_EXECVE, metrics.D_ID_SYSCALL_EXECVE_NOTE)
 			self.action_info.extend(data_list)
 
+	def __extract_meta_info(self, str_src, str_dst, node):
+		# pid
+		res = re.findall(r'PID=\d+', str_src, re.M | re.I)
+		if len(res) > 0:
+			node["pid"] = res[0][4:]
+		else:
+			self.log.error("Extract by re failed!")
+			raise Exception
+		# tid
+		res = re.findall(r'TID=\d+', str_src, re.M | re.I)
+		if len(res) > 0:
+			node["tid"] = res[0][4:]
+		else:
+			self.log.error("Extract by re failed!")
+			raise Exception
+		# exeline
+		re_index1 = re.search(r'\(PID=\d+, TID=\d+\)', str_src).span()
+		node["exeline"] = str_src[:re_index1[0]]
+
+		# systype
+		re_index2 = str_dst.find(':')
+		if re_index2 == -1:
+			self.log.error("Extract by find failed!")
+			raise Exception
+		node["call"] = str_dst[:re_index2]
+		# ret_info
+		node["ret_info"] = str_dst[re_index2+1:]
+
 	def handle_sysdig(self,output_list, act_id, act_id_note):
 		ret = []
 		for line in output_list:
@@ -436,7 +465,7 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 			str_dst = ""
 			str_comment = ""
 			node = {}
-			if 3 == len(parts) :
+			if 3 == len(parts):
 				(str_ts,str_src,str_dst) = parts
 				ts = self.parse_time(str_ts)
 				node = {"ts":ts, 'src':str_src, 'dst':str_dst}
@@ -447,6 +476,7 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 			node["ID"] = act_id
 			node["ID_NOTE"] = act_id_note
 			#self.log.debug("ts: %s, %s",ts,type(ts))
+			self.__extract_meta_info(str_src, str_dst, node)
 			ret.append(node)
 		return ret
 
@@ -908,6 +938,7 @@ class DynamicAnalyzer(base.BaseAnalyzer):
 				self.add_action([node['src'],node['dst'],node['ID'],node['ID_NOTE'],node['comment'],node['ts'].strftime("%H:%M:%S.%f")])
 			else:
 				self.add_action([node['src'],node['dst'],node['ID'],node['ID_NOTE'],node['ts'].strftime("%H:%M:%S.%f")])
+		return sorted_list
 
 	def output(self, fmt):
 		self.log.info("The output will be generated with format %s", fmt)

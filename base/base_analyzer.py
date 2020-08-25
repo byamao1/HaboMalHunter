@@ -50,6 +50,33 @@ class BaseAnalyzer():
 		f.write(ctx)
 		f.close()
 
+	def write_to_csv(self, dict_list, csv_name):
+		import pandas as pd
+		csvfile_path = os.path.join(self.cfg.file_log_dir, csv_name)
+		df = pd.DataFrame(dict_list)
+
+		# Change columns order
+		cols = list(df.columns)
+		if 'tid' in cols:
+			cols.insert(0, cols.pop(cols.index('tid')))
+		if 'pid' in cols:
+			cols.insert(0, cols.pop(cols.index('pid')))
+		if 'ts' in cols:
+			cols.insert(0, cols.pop(cols.index('ts')))
+		if 'comment' in cols:
+			cols.pop(cols.index('comment'))
+			cols.append('comment')
+		if 'src' in cols:
+			cols.pop(cols.index('src'))
+			cols.append('src')
+		if 'dst' in cols:
+			cols.pop(cols.index('dst'))
+			cols.append('dst')
+		df = df[cols]
+
+		df.to_csv(csvfile_path, mode='w', index=False, encoding="utf_8_sig", date_format="%H:%M:%S.%f")
+
+
 	def normalise(self, input):
 		output = None
 		if isinstance(input, list):

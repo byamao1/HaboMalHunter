@@ -79,7 +79,7 @@ function on_event()
 	end
 	ts =  evt.field(fevtime)
 	src = string.format("%s(PID=%d, TID=%d)",evt.field(fexeline), evt.field(fsrc_pid), evt.field(fsrc_tid))
-	dst = string.format("%s %s",evt.field(fevt_type),evt.field(fargs))
+	dst = string.format("%s: %s",evt.field(fevt_type),evt.field(fargs))
 	line = string.format('["%s", "%s", "%s" ]', ts, src, dst)
 	print(line)
 	return true
