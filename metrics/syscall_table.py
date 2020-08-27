@@ -348,4 +348,5 @@ Add_SysCall(1091, "set_thread_area")
 Add_SysCall(1092, "arch_prctl")
 Add_SysCall(1093, "waitpid")
 Add_SysCall(1094, "getrandom")
+Add_SysCall(1095, "prlimit")
 # add end
